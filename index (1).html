@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יועץ התמחור החכם — AI Pricing Advisor V1.0</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1a2333;--muted:#6b768c;--brand:#1f6feb;--brand-d:#1857c2;
+--ok:#1a7f4e;--warn:#b7791f;--bad:#c0392b;--line:#e3e8f2;--chip:#eef2fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font-family:"Heebo","Segoe UI",Arial,sans-serif;line-height:1.55}
+header.top{position:sticky;top:0;z-index:50;background:var(--ink);color:#fff;padding:12px 18px;
+display:flex;align-items:center;gap:12px}
+header.top .logo{font-size:22px}header.top h1{font-size:17px;margin:0;font-weight:700}
+header.top .ver{font-size:11px;background:#ffffff22;padding:2px 8px;border-radius:20px}
+header.top nav{margin-inline-start:auto;display:flex;gap:6px}
+header.top nav button{background:transparent;border:1px solid #ffffff33;color:#fff;border-radius:8px;
+padding:6px 12px;cursor:pointer;font-size:13px}
+header.top nav button.on{background:#fff;color:var(--ink);font-weight:700}
+main{max-width:860px;margin:0 auto;padding:18px 14px 90px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;
+box-shadow:0 1px 3px #1a23330d}
+.card h2{margin:0 0 10px;font-size:18px}.card h3{margin:14px 0 8px;font-size:15px}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.grow{flex:1;min-width:140px}
+label.f{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+button.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:11px 20px;
+font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+button.btn:hover{background:var(--brand-d)}button.btn.ghost{background:#fff;color:var(--brand);
+border:1.5px solid var(--brand)}button.btn.ghost:hover{background:var(--chip)}
+button.btn.big{font-size:17px;padding:14px 26px}button.btn:disabled{opacity:.5;cursor:not-allowed}
+.btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;margin-inline-start:6px}
+.tag.est{background:#fff3d6;color:#8a5a00;border:1px solid #ecd28a}
+.tag.ver{background:#dcf5e5;color:#0f6b3a;border:1px solid #a9dcbe}
+.tag.demo{background:#e8e4fb;color:#4a3d99;border:1px solid #c4bdf0}
+.chip{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:20px;
+padding:3px 12px;font-size:12.5px;margin:2px}
+.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.kv:last-child{border-bottom:0}.kv b{font-variant-numeric:tabular-nums}
+.pricebox{text-align:center;padding:16px;border-radius:14px;margin:8px 0}
+.pricebox.rec{background:linear-gradient(135deg,#1f6feb,#174ea6);color:#fff}
+.pricebox .pl{font-size:13px;opacity:.9}.pricebox.rec .pl{opacity:.85}
+.pricebox .pv{font-size:34px;font-weight:800;margin:4px 0;font-variant-numeric:tabular-nums}
+.pricebox .pd{font-size:12.5px;opacity:.85}
+.pricegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pricebox.small .pv{font-size:24px}
+.conf{font-weight:800;padding:4px 14px;border-radius:20px;font-size:14px}
+.conf.HIGH{background:#dcf5e5;color:#0f6b3a}.conf.MEDIUM{background:#fff3d6;color:#8a5a00}
+.conf.LOW{background:#fbdede;color:#a02c22}
+.insight{border-inline-start:4px solid var(--brand);background:#f7faff;border-radius:8px;padding:10px 12px;margin:8px 0}
+.insight b{display:block;font-size:14px}.insight p{margin:4px 0;font-size:13.5px}
+.insight .act{font-size:13px;color:var(--brand-d);font-weight:600}
+.understood{background:#f7faff;border:1px solid #cfe0ff;border-radius:10px;padding:12px;margin:10px 0}
+.stepbar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.stepbar span{font-size:12px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;color:var(--muted)}
+.stepbar span.on{background:var(--ink);color:#fff;font-weight:700;border-color:var(--ink)}
+.alert{border-radius:10px;padding:12px 14px;margin:10px 0;font-size:14px}
+.alert.warn{background:#fff8e6;border:1px solid #ecd28a}
+.alert.bad{background:#fdeeee;border:1px solid #f0b9b3}
+.alert.info{background:#eef4ff;border:1px solid #c4d8ff}
+table.q{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+table.q th,table.q td{border:1px solid var(--line);padding:8px;text-align:right}
+table.q th{background:var(--chip)}
+.jobitem{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);
+border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer}
+.jobitem:hover{border-color:var(--brand)}
+.st{font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px}
+.st.waiting{background:#fff3d6;color:#8a5a00}.st.approved{background:#dcf5e5;color:#0f6b3a}
+.st.rejected{background:#fbdede;color:#a02c22}.st.draft{background:var(--chip);color:var(--muted)}
+details.how{margin-top:10px;font-size:13px;color:var(--muted)}
+details.how summary{cursor:pointer;font-weight:600;color:var(--brand-d)}
+.voicebtn{background:#fff;border:1.5px solid var(--brand);color:var(--brand);border-radius:50%;
+width:46px;height:46px;font-size:20px;cursor:pointer;flex:none}
+.voicebtn.rec{background:#c0392b;border-color:#c0392b;color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.6}}
+@media print{header.top,.btnrow,.noprint{display:none!important}main{max-width:100%;padding:0}
+.card{box-shadow:none;border:0}body{background:#fff}}
+.quote-doc{border:2px solid var(--ink);border-radius:6px;padding:26px}
+.quote-doc h2{text-align:center;margin-top:0}
+.sig{margin-top:34px;display:flex;justify-content:space-between}
+.sig div{border-top:1px solid var(--ink);width:40%;text-align:center;padding-top:6px;font-size:13px}
+footer{font-size:11px;color:var(--muted);text-align:center;padding:20px}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:6px}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="logo">💰📷</span>
+  <h1>יועץ התמחור החכם</h1><span class="ver">V1.0 · MVP</span>
+  <nav id="mainnav">
+    <button data-nav="dash" class="on">עבודות</button>
+    <button data-nav="new">עבודה חדשה +</button>
+    <button data-nav="settings">הגדרות עסק</button>
+  </nav>
+</header>
+<main id="app"></main>
+<footer>כל הנתונים נשמרים על המכשיר הזה בלבד (V1.0) · שום מידע עסקי לא עוזב את המכשיר · נתוני הדגמה מסומנים בבירור</footer>
+
+<script>
+"use strict";
+/* =====================================================================
+   AI PRICING ADVISOR V1.0 — single-file build.
+   Pure engine functions live under window.AIPA (no DOM access) so the
+   same code is unit-tested headless in Node (tests/qa.js extracts this
+   script block). UI functions are prefixed UI_.
+   ===================================================================== */
+const AIPA = window.AIPA = {};
+
+/* ---------------- utils ---------------- */
+AIPA.uid = () => 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+AIPA.round50 = n => Math.round(n / 50) * 50;
+AIPA.fmt = n => (n == null || isNaN(n)) ? '—' : '₪' + Math.round(n).toLocaleString('he-IL');
+AIPA.clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+AIPA.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------------- constants: documented estimate assumptions ---------------- */
+AIPA.ASSUME = {
+  HOURS_PER_CAMERA: 1.2,          // documented labor estimate
+  INFRA_ADDER: { existing: 0, partial: 0.4, none: 0.8, unknown: 0.6 }, // h per camera
+  FLOOR_ADDER: { 1: 0, 2: 2.0, 3: 4.0 },   // hours (3 = 3+)
+  ACCESS_MULT: { easy: 1.0, medium: 1.15, hard: 1.35 },
+  CABLE_PER_CAM_M: 18, CABLE_PER_FLOOR_M: 12,
+  CONNECTORS_FLAT: 120,            // ₪ estimate, mounts+connectors
+  ROUNDTRIP_KM_DEFAULT: 25,
+  NVR_MIN_CAMERAS: 5,
+  BUFFER_BASE_PCT: 5, BUFFER_PER_COMPLEXITY_PT: 0.1, BUFFER_PER_UNKNOWN: 2, BUFFER_CAP_PCT: 25,
+  WINPROB_MIN_QUOTES: 8
+};
+
+/* ---------------- demo market dataset (LABELED — not real market data) ---------------- */
+AIPA.DEMO_MARKET = [
+  // {propertyType, camBucket, infra, region, min, max, median, n, label, date}
+  { propertyType:'house',    camBucket:'1-4',  infra:'existing', region:'center', min:2200, max:3800, median:2900, n:6, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-06' },
+  { propertyType:'house',    camBucket:'5-8',  infra:'existing', region:'center', min:4200, max:6800, median:5400, n:5, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-06' },
+  { propertyType:'house',    camBucket:'5-8',  infra:'none',     region:'center', min:6500, max:9800, median:7900, n:4, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-05' },
+  { propertyType:'house',    camBucket:'9-16', infra:'none',     region:'center', min:11000,max:17000,median:13800,n:3, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-04' },
+  { propertyType:'apartment',camBucket:'1-4',  infra:'existing', region:'center', min:1800, max:3200, median:2400, n:7, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-06' },
+  { propertyType:'office',   camBucket:'5-8',  infra:'partial',  region:'center', min:5200, max:8400, median:6600, n:4, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-05' },
+  { propertyType:'shop',     camBucket:'1-4',  infra:'existing', region:'center', min:2400, max:4200, median:3200, n:5, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-06' },
+  { propertyType:'warehouse',camBucket:'9-16', infra:'none',     region:'center', min:13000,max:21000,median:16500,n:3, label:'נתוני הדגמה — התקנות דומות (מרכז)', date:'2026-03' },
+];
+AIPA.DEMO_BANNER = 'נתוני הדגמה בלבד — אינם נתוני שוק אמיתיים';
+
+/* ---------------- Hebrew labels ---------------- */
+AIPA.LBL = {
+  propertyType: { house:'בית פרטי', apartment:'דירה', office:'משרד', shop:'חנות', warehouse:'מחסן', factory:'מפעל', building:'בניין', other:'אחר', unknown:'לא ידוע' },
+  jobType: { new:'התקנה חדשה', replacement:'החלפה', expansion:'הרחבה', unknown:'לא ידוע' },
+  infra: { existing:'תשתית קיימת ומתאימה', partial:'תשתית חלקית', none:'אין תשתית', unknown:'לא ידוע' },
+  access: { easy:'גישה קלה', medium:'גישה בינונית', hard:'גישה קשה', unknown:'לא ידוע' },
+  complexityBand: s => s <= 33 ? 'קלה' : s <= 66 ? 'בינונית' : 'גבוהה',
+  confidence: { HIGH:'גבוהה', MEDIUM:'בינונית', LOW:'נמוכה' },
+  qstatus: { waiting:'ממתין', approved:'אושר', rejected:'נדחה', draft:'טיוטה' },
+  rejReason: { price:'מחיר', other:'בחר ספק אחר', postponed:'העבודה נדחתה', unknown:'לא ידוע' }
+};
+AIPA.camBucket = cams => cams <= 4 ? '1-4' : cams <= 8 ? '5-8' : cams <= 16 ? '9-16' : '17+';
+
+/* ---------------- store ---------------- */
+AIPA.LS_KEY = 'aipa_v1';
+AIPA.defaultBusiness = () => ({
+  id: AIPA.uid(), name:'', phone:'', email:'', city:'', areas:[],
+  laborHourly: 220, helperHourly: 150, kmCost: 2.5,
+  overheadPct: 12, targetMarginPct: 30, minMarginPct: 12,
+  vatRegistered: true, vatPct: 18,
+  equipUnitCamera: 380, equipUnitNVR: 900, cablePerMeter: 4.5,
+  warrantyMonths: 12, paymentTerms:'שוטף + 30', quoteValidityDays: 14,
+  jobs: {}
+});
+AIPA.load = function () {
+  try {
+    const raw = (typeof localStorage !== 'undefined') && localStorage.getItem(AIPA.LS_KEY);
+    if (raw) { const s = JSON.parse(raw); if (s && s.version === 1) return s; }
+  } catch (e) {}
+  const b = AIPA.defaultBusiness();
+  return { version: 1, activeBusinessId: b.id, demoMarketEnabled: true,
+           businesses: { [b.id]: b }, marketObservations: [] };
+};
+AIPA.save = function (s) {
+  try { if (typeof localStorage !== 'undefined') localStorage.setItem(AIPA.LS_KEY, JSON.stringify(s)); } catch (e) {}
+  return s;
+};
+AIPA.biz = s => s.businesses[s.activeBusinessId];
+</script>
+<script>
+"use strict";
+/* ================= EXTRACTION — Hebrew free text → job params =================
+   Deterministic keyword/regex rules. Anything not found stays 'unknown'.
+   Never invents values. */
+AIPA.extract = function (text) {
+  const t = ' ' + String(text || '').replace(/\s+/g, ' ') + ' ';
+  const p = { cameras: null, indoor: null, outdoor: null, propertyType: 'unknown',
+              jobType: 'unknown', infrastructure: 'unknown', floors: null,
+              city: 'unknown', accessDifficulty: 'unknown' };
+  const meta = {};
+  const num = (re) => { const m = t.match(re); return m ? parseInt(m[1], 10) : null; };
+
+  let m = t.match(/(\d+)\s*מצלמות?/);
+  if (m) { p.cameras = parseInt(m[1], 10); meta.cameras = { source: 'user' }; }
+  m = t.match(/(\d+)\s*בחוץ/); if (m) { p.outdoor = parseInt(m[1], 10); meta.outdoor = { source: 'user' }; }
+  m = t.match(/(\d+)\s*(?:בפנים|בתוך)/); if (m) { p.indoor = parseInt(m[1], 10); meta.indoor = { source: 'user' }; }
+  if (/מצלמות?\s*(?:חוץ|חיצוניות?)/.test(t) && p.outdoor == null && p.cameras) { p.outdoor = p.cameras; meta.outdoor = { source: 'ai-estimate', note: 'כל המצלמות בחוץ (הערכה)' }; }
+  if (/מצלמות?\s*(?:פנים|פנימיות?)/.test(t) && p.indoor == null && p.cameras) { p.indoor = p.cameras; meta.indoor = { source: 'ai-estimate', note: 'כל המצלמות בפנים (הערכה)' }; }
+
+  const floorWords = { 'קומה אחת': 1, 'שתי קומות': 2, 'שני קומות': 2, 'שלוש קומות': 3, 'שלושה קומות': 3, 'ארבע קומות': 4 };
+  for (const k in floorWords) if (t.includes(k)) { p.floors = floorWords[k]; meta.floors = { source: 'user' }; break; }
+  if (p.floors == null) { const f = num(/(\d+)\s*קומות?/); if (f) { p.floors = Math.min(f, 4); meta.floors = { source: 'user' }; } }
+
+  const props = [['בית פרטי', 'house'], ['דירה', 'apartment'], ['משרד', 'office'], ['חנות', 'shop'],
+                 ['מחסן', 'warehouse'], ['מפעל', 'factory'], ['בניין', 'building']];
+  for (const [w, v] of props) if (t.includes(w)) { p.propertyType = v; meta.propertyType = { source: 'user' }; break; }
+
+  if (/אין תשתית|בלי תשתית|חוסר תשתית/.test(t)) { p.infrastructure = 'none'; meta.infrastructure = { source: 'user' }; }
+  else if (/תשתית חלקית/.test(t)) { p.infrastructure = 'partial'; meta.infrastructure = { source: 'user' }; }
+  else if (/יש תשתית|תשתית קיימת|תשתית מתאימה/.test(t)) { p.infrastructure = 'existing'; meta.infrastructure = { source: 'user' }; }
+
+  if (/החלפה|להחליף/.test(t)) { p.jobType = 'replacement'; meta.jobType = { source: 'user' }; }
+  else if (/הרחבה|להרחיב|להוסיף/.test(t)) { p.jobType = 'expansion'; meta.jobType = { source: 'user' }; }
+  else if (/התקנה חדשה|חדש/.test(t) || p.infrastructure === 'none') { p.jobType = 'new'; meta.jobType = { source: p.infrastructure === 'none' && !/התקנה/.test(t) ? 'ai-estimate' : 'user' }; }
+
+  if (/גישה קשה|קשה להגיע|גבוה|סולם|פיגום/.test(t)) { p.accessDifficulty = 'hard'; meta.accessDifficulty = { source: 'user' }; }
+  else if (/גישה נוחה|גישה קלה|נגיש/.test(t)) { p.accessDifficulty = 'easy'; meta.accessDifficulty = { source: 'user' }; }
+  if (/קידוח/.test(t) && p.accessDifficulty === 'unknown') { p.accessDifficulty = 'medium'; meta.accessDifficulty = { source: 'ai-estimate', note: 'קידוחים מרמזים על מורכבות בינונית' }; }
+
+  const cities = ['תל אביב', 'ירושלים', 'חיפה', 'ראשון לציון', 'פתח תקווה', 'אשדוד', 'נתניה', 'באר שבע',
+                  'חולון', 'רמת גן', 'הרצליה', 'כפר סבא', 'רעננה', 'מודיעין', 'לוד', 'רחובות', 'בת ים', 'אילת'];
+  for (const c of cities) if (t.includes(c)) { p.city = c; meta.city = { source: 'user' }; break; }
+
+  // split inference: if total known and one side known, infer the other (labeled estimate)
+  if (p.cameras && p.outdoor != null && p.indoor == null) { p.indoor = Math.max(0, p.cameras - p.outdoor); meta.indoor = { source: 'ai-estimate', note: 'חושב מההפרש (הערכה)' }; }
+  if (p.cameras && p.indoor != null && p.outdoor == null) { p.outdoor = Math.max(0, p.cameras - p.indoor); meta.outdoor = { source: 'ai-estimate', note: 'חושב מההפרש (הערכה)' }; }
+  return { params: p, meta };
+};
+
+/* Clarification: at most 4 questions, ordered by pricing materiality.
+   Every question includes "לא יודע/ת". */
+AIPA.CLARIFY_ORDER = [
+  { field: 'infrastructure', q: 'מה מצב התשתית הקיימת?', opts: [['existing', 'יש תשתית מתאימה'], ['partial', 'תשתית חלקית'], ['none', 'אין תשתית']] },
+  { field: 'propertyType', q: 'איזה סוג נכס?', opts: [['house', 'בית פרטי'], ['apartment', 'דירה'], ['office', 'משרד'], ['shop', 'חנות'], ['warehouse', 'מחסן'], ['factory', 'מפעל'], ['building', 'בניין'], ['other', 'אחר']] },
+  { field: 'split', q: 'איך מתחלקות המצלמות בין פנים לחוץ?', type: 'split' },
+  { field: 'floors', q: 'כמה קומות בנכס?', opts: [['1', 'קומה אחת'], ['2', 'שתי קומות'], ['3', 'שלוש קומות ומעלה']] },
+  { field: 'city', q: 'באיזו עיר / אזור העבודה?', type: 'text', ph: 'למשל: ראשון לציון' },
+  { field: 'jobType', q: 'סוג העבודה?', opts: [['new', 'התקנה חדשה'], ['replacement', 'החלפה'], ['expansion', 'הרחבה']] },
+  { field: 'accessDifficulty', q: 'רמת הגישה / קושי ההתקנה?', opts: [['easy', 'קלה'], ['medium', 'בינונית'], ['hard', 'קשה']] },
+];
+AIPA.isUnknown = (p, field) => {
+  if (field === 'split') return !(p.indoor != null && p.outdoor != null) || (p.indoor == null && p.outdoor == null && p.cameras == null);
+  if (field === 'floors' || field === 'city') return p[field] == null || p[field] === 'unknown';
+  return p[field] === 'unknown' || p[field] == null;
+};
+AIPA.MATERIAL_FIELDS = ['infrastructure', 'propertyType', 'split', 'floors', 'city'];
+AIPA.pickQuestions = function (p, maxN) {
+  maxN = maxN || 4;
+  const out = [];
+  for (const q of AIPA.CLARIFY_ORDER) {
+    if (out.length >= maxN) break;
+    if (AIPA.isUnknown(p, q.field)) out.push(q);
+  }
+  return out;
+};
+/* Apply clarification answers; 'dontknow' keeps unknown (estimate path later). */
+AIPA.applyAnswers = function (p, meta, answers) {
+  for (const field in answers) {
+    const v = answers[field];
+    if (v === 'dontknow' || v === '' || v == null) continue;
+    if (field === 'split') {
+      if (v.indoor != null) { p.indoor = v.indoor; meta.indoor = { source: 'user' }; }
+      if (v.outdoor != null) { p.outdoor = v.outdoor; meta.outdoor = { source: 'user' }; }
+      continue;
+    }
+    if (field === 'floors') p.floors = parseInt(v, 10);
+    else p[field] = v;
+    meta[field] = { source: 'user' };
+  }
+  return { p, meta };
+};
+</script>
+<script>
+"use strict";
+/* ================= ENGINES (pure — no DOM) ================= */
+
+/* ---- Complexity Engine: 0–100, weights documented in SPEC.md §5 ---- */
+AIPA.complexity = function (p) {
+  const A = AIPA.ASSUME;
+  const cams = p.cameras || 4;
+  let score = 0; const parts = [];
+  const add = (pts, label) => { score += pts; parts.push({ pts, label }); };
+  add(cams <= 4 ? 5 : cams <= 8 ? 10 : cams <= 16 ? 15 : 20, 'מספר מצלמות (' + cams + ')');
+  add({ existing: 0, partial: 10, none: 20, unknown: 12 }[p.infrastructure] ?? 12, 'תשתית: ' + AIPA.LBL.infra[p.infrastructure]);
+  const fl = p.floors || 1;
+  add(fl <= 1 ? 0 : fl === 2 ? 8 : 15, 'קומות: ' + fl);
+  add({ easy: 0, medium: 8, hard: 15, unknown: 8 }[p.accessDifficulty] ?? 8, 'גישה: ' + AIPA.LBL.access[p.accessDifficulty]);
+  const indoor = p.indoor || 0, outdoor = p.outdoor || 0;
+  add(indoor > 0 && outdoor > 0 ? 5 : outdoor > indoor ? 10 : 0, 'תמהיל פנים/חוץ');
+  add({ apartment: 2, house: 5, office: 6, shop: 6, warehouse: 10, factory: 10, building: 10, other: 6, unknown: 5 }[p.propertyType] ?? 5, 'סוג נכס');
+  const cableM = cams * A.CABLE_PER_CAM_M + fl * A.CABLE_PER_FLOOR_M;
+  add(cableM < 100 ? 2 : cableM <= 200 ? 5 : cableM <= 350 ? 8 : 10, 'אורך כבל משוער (' + Math.round(cableM) + ' מ׳)');
+  score = AIPA.clamp(Math.round(score), 0, 100);
+  return { score, band: AIPA.LBL.complexityBand(score), parts, cableMetersEst: Math.round(cableM) };
+};
+
+/* ---- Learning: calibration factors from owner's history ---- */
+AIPA.learningFactors = function (biz) {
+  const jobs = Object.values(biz.jobs || {}).filter(j => j.variance);
+  const f = { labor: 1, equip: 1, n: 0, laborBiasPct: 0, equipBiasPct: 0 };
+  if (jobs.length < 3) return f;
+  let lb = 0, eb = 0;
+  for (const j of jobs) {
+    if (j.variance.laborHoursEst && j.variance.laborHoursActual)
+      lb += (j.variance.laborHoursActual - j.variance.laborHoursEst) / j.variance.laborHoursEst;
+    if (j.variance.equipCostEst && j.variance.equipCostActual)
+      eb += (j.variance.equipCostActual - j.variance.equipCostEst) / j.variance.equipCostEst;
+  }
+  f.n = jobs.length;
+  f.laborBiasPct = Math.round(lb / jobs.length * 100);
+  f.equipBiasPct = Math.round(eb / jobs.length * 100);
+  if (Math.abs(f.laborBiasPct) >= 15) f.labor = 1 + f.laborBiasPct / 100;
+  if (Math.abs(f.equipBiasPct) >= 15) f.equip = 1 + f.equipBiasPct / 100;
+  return f;
+};
+
+/* ---- Cost Engine ---- */
+AIPA.costEngine = function (biz, p, complexity) {
+  const A = AIPA.ASSUME;
+  const cams = p.cameras || 4;
+  const fl = p.floors || 1;
+  const learn = AIPA.learningFactors(biz);
+  const calibNote = learn.n >= 3 && (learn.labor !== 1 || learn.equip !== 1)
+    ? 'מכויל מההיסטוריה שלך (n=' + learn.n + ')' : null;
+
+  let laborHoursEst = cams * A.HOURS_PER_CAMERA
+    + cams * (A.INFRA_ADDER[p.infrastructure] ?? A.INFRA_ADDER.unknown)
+    + (A.FLOOR_ADDER[Math.min(fl, 3)] ?? 0);
+  laborHoursEst *= (A.ACCESS_MULT[p.accessDifficulty] ?? A.ACCESS_MULT.unknown ?? 1.15);
+  laborHoursEst *= learn.labor;
+  laborHoursEst = Math.round(laborHoursEst * 2) / 2;
+
+  const needsHelper = p.accessDifficulty === 'hard' && cams >= 6;
+  const laborCost = Math.round(laborHoursEst * biz.laborHourly * (needsHelper ? 1.25 : 1));
+
+  const cableM = complexity.cableMetersEst;
+  const materialsCost = Math.round(cableM * biz.cablePerMeter);
+  let equipCost = Math.round(cams * biz.equipUnitCamera * learn.equip);
+  if (cams >= A.NVR_MIN_CAMERAS) equipCost += biz.equipUnitNVR;
+  equipCost += A.CONNECTORS_FLAT;
+
+  const travelCost = Math.round(2 * A.ROUNDTRIP_KM_DEFAULT * biz.kmCost);
+  const subtotal = laborCost + equipCost + materialsCost + travelCost;
+  const overhead = Math.round(subtotal * biz.overheadPct / 100);
+
+  const unknowns = AIPA.MATERIAL_FIELDS.filter(f => AIPA.isUnknown(p, f)).length;
+  let bufferPct = A.BUFFER_BASE_PCT + complexity.score * A.BUFFER_PER_COMPLEXITY_PT + unknowns * A.BUFFER_PER_UNKNOWN;
+  bufferPct = Math.min(A.BUFFER_CAP_PCT, Math.round(bufferPct));
+  const bufferCost = Math.round((subtotal + overhead) * bufferPct / 100);
+  const trueCost = subtotal + overhead + bufferCost;
+
+  const estShare = (laborCost + materialsCost + bufferCost) / Math.max(1, trueCost);
+  return {
+    laborHoursEst, laborCost, needsHelper, equipCost, materialsCost, cableMetersEst: cableM,
+    travelCost, overhead, bufferPct, bufferCost, trueCost, estShare,
+    calibNote, unknowns,
+    estimateFlags: ['laborHoursEst', 'materialsCost', 'cableMetersEst', 'travelCost', 'bufferPct']
+  };
+};
+
+/* ---- Market Engine — RULE 4: never fabricate ---- */
+AIPA.marketEngine = function (store, biz, p) {
+  const bucket = AIPA.camBucket(p.cameras || 4);
+  const region = 'center'; // V1.0: demo data is center-region; owner observations carry their own geography
+  const points = [];
+  if (store.demoMarketEnabled) {
+    for (const d of AIPA.DEMO_MARKET) {
+      if (d.propertyType === p.propertyType && d.camBucket === bucket &&
+          (d.infra === p.infrastructure || p.infrastructure === 'unknown') &&
+          d.region === region)
+        points.push({ min: d.min, max: d.max, median: d.median, n: d.n, source: 'demo', label: d.label, date: d.date });
+    }
+  }
+  for (const o of (store.marketObservations || [])) {
+    if (o.category.propertyType === p.propertyType && o.category.camBucket === bucket) points.push(o);
+  }
+  const n = points.reduce((s, x) => s + (x.n || 1), 0);
+  const hasReal = points.some(x => x.source !== 'demo');
+  const sufficient = n >= 3 && (hasReal || store.demoMarketEnabled);
+  if (!sufficient || !points.length) {
+    return { sufficient: false, demoOnly: false, n, points: [],
+             note: 'אין מספיק נתוני שוק לקטגוריה זו. הטווח וההמלצה מבוססים על עלויות העסק בלבד — לא הומצא שום מחיר שוק.' };
+  }
+  const medians = points.map(x => x.median || (x.priceMin + x.priceMax) / 2).sort((a, b) => a - b);
+  const median = medians[Math.floor(medians.length / 2)];
+  const min = Math.min(...points.map(x => x.min != null ? x.min : x.priceMin));
+  const max = Math.max(...points.map(x => x.max != null ? x.max : x.priceMax));
+  const demoOnly = !hasReal;
+  return {
+    sufficient: true, demoOnly, n,
+    min, max, median: Math.round(median),
+    sources: points.map(x => ({ label: x.label || x.sourceLabel, date: x.date, n: x.n || 1, demo: x.source === 'demo' })),
+    note: demoOnly ? AIPA.DEMO_BANNER + ' — יש להחליף בנתוני שוק אמיתיים.' : 'מבוסס על ' + n + ' תצפיות שוק.'
+  };
+};
+
+/* ---- Pricing Engine: floor / competitive / recommended / premium ---- */
+AIPA.priceEngine = function (biz, cost, market, complexity) {
+  const floor = AIPA.round50(cost.trueCost * (1 + biz.minMarginPct / 100));
+  const competitive = market.sufficient ? AIPA.round50(market.median) : null;
+  let base = cost.trueCost * (1 + biz.targetMarginPct / 100);
+  let premium = AIPA.round50(Math.max(cost.trueCost * (1 + (biz.targetMarginPct + 15) / 100),
+                                      market.sufficient ? market.max : 0));
+  // expected-profit optimization only with sufficient history
+  let winModel = null;
+  const decided = Object.values(biz.jobs || {}).filter(j => j.quote && (j.quote.status === 'approved' || j.quote.status === 'rejected'));
+  if (decided.length >= AIPA.ASSUME.WINPROB_MIN_QUOTES) {
+    const buckets = { low: { w: 0, n: 0 }, mid: { w: 0, n: 0 }, high: { w: 0, n: 0 } };
+    for (const j of decided) {
+      const pos = j.chosen && j.chosen.position;
+      const b = pos === 'floor' ? 'low' : pos === 'premium' ? 'high' : 'mid';
+      buckets[b].n++; if (j.quote.status === 'approved') buckets[b].w++;
+    }
+    const pwin = b => buckets[b].n ? buckets[b].w / buckets[b].n : 0.5;
+    const cands = [
+      { price: floor, b: 'low' },
+      ...(competitive ? [{ price: competitive, b: 'mid' }] : []),
+      { price: AIPA.round50(base), b: 'mid' },
+      { price: premium, b: 'high' }
+    ];
+    let best = null;
+    for (const c of cands) {
+      const ep = (c.price - cost.trueCost) * pwin(c.b);
+      if (!best || ep > best.ep) best = { price: c.price, ep, pwin: pwin(c.b) };
+    }
+    winModel = { bestPrice: best.price, expectedProfit: Math.round(best.ep), pwin: Math.round(best.pwin * 100), n: decided.length };
+    base = best.price;
+  } else if (market.sufficient && competitive) {
+    // nudge toward market median when inside economics
+    if (competitive >= floor && competitive <= premium) base = (base + competitive) / 2;
+  }
+  let recommended = AIPA.round50(AIPA.clamp(base, floor, premium));
+  if (competitive && recommended < competitive * 0.9 && market.sufficient && !market.demoOnly) {
+    // don't stray too far below solid market evidence without reason
+    recommended = AIPA.round50(Math.max(recommended, competitive * 0.9));
+  }
+  return {
+    floor, competitive, recommended, premium, winModel,
+    drivers: [
+      'עלות אמיתית משוערת: ' + AIPA.fmt(cost.trueCost),
+      'מורכבות: ' + complexity.band + ' (' + complexity.score + '/100)',
+      market.sufficient ? 'טווח שוק: ' + AIPA.fmt(market.min) + '–' + AIPA.fmt(market.max) + (market.demoOnly ? ' (דמו)' : '') : 'אין נתוני שוק מספיקים — מחיר מבוסס עלויות',
+      winModel ? 'מודל רווח צפוי מההיסטוריה שלך (n=' + winModel.n + ')' : 'יעד רווח: ' + biz.targetMarginPct + '%'
+    ]
+  };
+};
+
+/* ---- Confidence Engine ---- */
+AIPA.confidenceEngine = function (biz, p, cost, market) {
+  let s = 100; const reasons = [];
+  const unk = AIPA.MATERIAL_FIELDS.filter(f => AIPA.isUnknown(p, f));
+  if (unk.length) { s -= 15 * unk.length; reasons.push(unk.length + ' פרמטרים מהותיים לא ידועים'); }
+  if (!market.sufficient) { s -= 20; reasons.push('אין נתוני שוק מספיקים'); }
+  else if (market.demoOnly) { s -= 10; reasons.push('נתוני שוק הם נתוני הדגמה בלבד'); }
+  if (cost.estShare > 0.4) { s -= 10; reasons.push('נתח גבוה של הערכות בעלות (' + Math.round(cost.estShare * 100) + '%)'); }
+  const decidedN = Object.values(biz.jobs || {}).filter(j => j.quote && j.quote.status !== 'waiting' && j.quote.status !== 'draft').length;
+  if (decidedN < 5) { s -= 10; reasons.push('היסטוריית עסקאות דלה (n=' + decidedN + ')'); }
+  s = AIPA.clamp(Math.round(s), 5, 100);
+  const level = s >= 80 ? 'HIGH' : s >= 50 ? 'MEDIUM' : 'LOW';
+  if (level === 'LOW') reasons.push('רמת ביטחון נמוכה — הטווח הורחב, אין ודאות מדומה');
+  return { score: s, level, reasons };
+};
+
+/* ---- Business Advisor: max 3 insights, WHAT/WHY/ACTION ---- */
+AIPA.advisor = function (biz, job, cost, market, prices, confidence) {
+  const out = [];
+  const push = (what, why, action) => { if (out.length < 3) out.push({ what, why, action }); };
+  const decided = Object.values(biz.jobs || {}).filter(j => j.quote && (j.quote.status === 'approved' || j.quote.status === 'rejected') && j.id !== job.id);
+  // 1. positioning vs own win band
+  if (decided.length >= 3) {
+    const won = decided.filter(j => j.quote.status === 'approved' && j.chosen);
+    if (won.length >= 2) {
+      const ratios = won.map(j => j.chosen.price / Math.max(1, j.cost.trueCost)).sort((a, b) => a - b);
+      const lo = ratios[0], hi = ratios[ratios.length - 1];
+      const r = prices.recommended / Math.max(1, cost.trueCost);
+      if (r < lo * 0.95) push('המחיר המומלץ נמוך ב־' + Math.round((1 - r / lo) * 100) + '% מהטווח שבו אתה בדרך כלל זוכה.',
+        'בעבודות דומות זכית כשתמחרת בטווח גבוה יותר — ייתכן שאתה משאיר כסף על השולחן.',
+        'שקול לבחור במחיר ה־Premium או להעלות את המומלץ.');
+      else if (r > hi * 1.05) push('המחיר המומלץ גבוה ב־' + Math.round((r / hi - 1) * 100) + '% מהטווח שבו אתה בדרך כלל זוכה.',
+        'תמחור מעל טווח הזכייה ההיסטורי שלך עלול להוריד את סיכויי הסגירה.',
+        'שקול את מחיר ה־Competitive או בדוק מה מצדיק את הפרמיה מול הלקוח.');
+    }
+  }
+  // 2/3. learning biases
+  const lf = AIPA.learningFactors(biz);
+  if (lf.n >= 3 && Math.abs(lf.laborBiasPct) >= 15)
+    push('אתה ' + (lf.laborBiasPct > 0 ? 'מעריך בחסר' : 'מעריך ביתר') + ' שעות עבודה ב־' + Math.abs(lf.laborBiasPct) + '% בממוצע.',
+      'ההערכות כבר כוילו אוטומטית, אבל שווה לבדוק איפה הזמן באמת הולך.',
+      'בהצעת המחיר הנוכחית שעות העבודה כבר מתוקנות לפי ההיסטוריה שלך (n=' + lf.n + ').');
+  if (lf.n >= 3 && Math.abs(lf.equipBiasPct) >= 15)
+    push('עלויות הציוד בפועל ' + (lf.equipBiasPct > 0 ? 'גבוהות' : 'נמוכות') + ' ב־' + Math.abs(lf.equipBiasPct) + '% מההערכות.',
+      'פער שיטתי בין הערכת ציוד למציאות פוגע בשולי הרווח.',
+      'עדכן את מחירי הספק בהגדרות העסק, או בדוק עלויות נסתרות (מחברים, מתאמים).');
+  // 4. unknown-heavy
+  if (cost.unknowns >= 3)
+    push(cost.unknowns + ' פרמטרים מהותיים עדיין לא ידועים.',
+      'כל פרמטר לא ידוע מרחיב את טווח הטעות — במיוחד תשתית וסוג נכס.',
+      'שקול סיור מקדים לפני שליחת הצעת מחיר סופית.');
+  // 5. market position (only with sufficient market data)
+  if (market.sufficient && !market.demoOnly) {
+    const q = (prices.recommended - market.min) / Math.max(1, market.max - market.min);
+    if (q < 0.25) push('המחיר המומלץ נמצא ברבעון התחתון של השוק.',
+      'תמחור נמוך מהשוק יכול להגדיל סגירות אבל שוחק רווחיות וממצב אותך כזול.',
+      'אם האיכות/אחריות שלך גבוהות — שקול להתקרב לחציון השוק.');
+    else if (q > 0.8) push('המחיר המומלץ נמצא ברבעון העליון של השוק.',
+      'פרמיה דורשת הצדקה ברורה מול הלקוח (אחריות, ציוד, שירות).',
+      'ודא שההצעה מבליטה את הערך שמצדיק את המחיר.');
+  }
+  // 6. maintenance suggestion
+  if ((job.params.propertyType === 'house' || job.params.propertyType === 'building') && out.length < 3)
+    push('עבודה מסוג זה מתאימה לחבילת תחזוקה שנתית.',
+      'לקוחות עם מערכות גדולות חוזרים לתחזוקה — הכנסה חוזרת בלי עלות שיווק.',
+      'הוסף להצעה אופציה: ביקורת שנתית + ניקוי עדשות במחיר קבוע.');
+  return out.slice(0, 3);
+};
+
+/* ---- Variance + learning record ---- */
+AIPA.recordActuals = function (job, actuals) {
+  job.actuals = Object.assign({ completedAt: new Date().toISOString() }, actuals);
+  const est = job.cost;
+  const actualCost = (actuals.laborHours || 0) * 0 /* labor recompute needs biz; stored below */ ;
+  job.variance = {
+    laborHoursEst: est.laborHoursEst, laborHoursActual: actuals.laborHours || 0,
+    equipCostEst: est.equipCost, equipCostActual: actuals.equipCost || 0,
+    extras: actuals.extras || 0,
+    quotedPrice: job.chosen ? job.chosen.price : null
+  };
+  return job;
+};
+AIPA.profitSummary = function (biz, job) {
+  const v = job.variance; if (!v) return null;
+  const laborActual = v.laborHoursActual * biz.laborHourly;
+  const costActual = laborActual + v.equipCostActual + v.extras;
+  const costEst = job.cost.trueCost;
+  const price = v.quotedPrice || job.prices.recommended;
+  return {
+    costEst: Math.round(costEst), costActual: Math.round(costActual),
+    profitEst: Math.round(price - costEst), profitActual: Math.round(price - costActual),
+    variancePct: costEst ? Math.round((costActual - costEst) / costEst * 100) : 0
+  };
+};
+</script>
+<script>
+"use strict";
+/* ================= UI ================= */
+let S = AIPA.load();
+let UI = { nav: 'dash', wiz: null, jobId: null };
+const $app = () => document.getElementById('app');
+const E = AIPA.esc, F = AIPA.fmt, L = AIPA.LBL;
+
+function UI_save() { AIPA.save(S); }
+function UI_nav(name) { UI.nav = name; UI.wiz = null; UI.jobId = null; UI_render(); }
+function UI_render() {
+  document.querySelectorAll('#mainnav button').forEach(b => b.classList.toggle('on', b.dataset.nav === UI.nav));
+  if (UI.nav === 'dash') UI_dash();
+  else if (UI.nav === 'settings') UI_settings();
+  else if (UI.nav === 'new') UI_wiz();
+  else if (UI.nav === 'job') UI_job();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-nav]'); if (b) UI_nav(b.dataset.nav); });
+
+/* ---------- dashboard ---------- */
+function UI_dash() {
+  const biz = AIPA.biz(S);
+  const jobs = Object.values(biz.jobs || {}).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  let h = '<div class="card"><h2>👋 שלום' + (biz.name ? ', ' + E(biz.name) : '') + '</h2>';
+  h += '<p class="muted">תאר/י עבודה במשפט אחד — המערכת תחלץ פרמטרים, תשאל רק מה שחסר, ותחשב כמה כדאי לגבות.</p>';
+  h += '<div class="btnrow"><button class="btn big" data-nav="new">+ עבודה חדשה</button>';
+  if (!biz.laborHourly) h += '<button class="btn ghost" data-nav="settings">הגדרות עסק</button>';
+  h += '</div></div>';
+  h += '<div class="card"><h2>עבודות (' + jobs.length + ')</h2>';
+  if (!jobs.length) h += '<p class="muted">עדיין אין עבודות. התחל/י בעבודה חדשה למעלה.</p>';
+  for (const j of jobs) {
+    const st = j.quote ? j.quote.status : 'draft';
+    h += '<div class="jobitem" data-open="' + j.id + '"><div class="grow"><b>' + E(UI_jobTitle(j)) + '</b><br>' +
+      '<span class="muted">' + E((j.createdAt || '').slice(0, 10)) +
+      (j.chosen ? ' · נבחר: ' + F(j.chosen.price) : '') + '</span></div>' +
+      '<span class="st ' + st + '">' + L.qstatus[st] + '</span></div>';
+  }
+  h += '</div>';
+  $app().innerHTML = h;
+  $app().querySelectorAll('[data-open]').forEach(el => el.onclick = () => { UI.jobId = el.dataset.open; UI.nav = 'job'; UI_render(); });
+}
+function UI_jobTitle(j) {
+  const p = j.params || {};
+  const cams = p.cameras ? p.cameras + ' מצלמות' : 'עבודה';
+  return cams + ' · ' + (L.propertyType[p.propertyType] || '');
+}
+
+/* ---------- settings ---------- */
+function UI_settings() {
+  const b = AIPA.biz(S);
+  const num = (k, label, hint) =>
+    '<label class="f">' + label + (hint ? ' <span class="muted">' + hint + '</span>' : '') + '</label>' +
+    '<input type="number" id="s_' + k + '" value="' + E(b[k]) + '" min="0" step="any">';
+  let h = '<div class="card"><h2>⚙️ הגדרות עסק</h2><p class="muted">מוגדר פעם אחת. כל המחירים שלך מחושבים מהנתונים האלה — <b>שום מחיר לא מומצא</b>.</p>';
+  h += '<div class="row"><div class="grow"><label class="f">שם העסק</label><input id="s_name" value="' + E(b.name) + '"></div>';
+  h += '<div class="grow"><label class="f">טלפון</label><input id="s_phone" value="' + E(b.phone) + '"></div></div>';
+  h += '<div class="row"><div class="grow"><label class="f">עיר</label><input id="s_city" value="' + E(b.city) + '"></div>';
+  h += '<div class="grow"><label class="f">אימייל</label><input id="s_email" value="' + E(b.email) + '"></div></div>';
+  h += '<h3>עלויות <span class="tag ver">נתון מאומת</span></h3><div class="row">';
+  h += '<div class="grow">' + num('laborHourly', 'עלות שעת עבודה (₪)') + '</div>';
+  h += '<div class="grow">' + num('helperHourly', 'עלות עובד נוסף לשעה (₪)') + '</div>';
+  h += '<div class="grow">' + num('kmCost', 'עלות נסיעה לק״מ (₪)') + '</div></div><div class="row">';
+  h += '<div class="grow">' + num('overheadPct', 'תקורה (%)', 'שכירות, ביטוח, וכו׳') + '</div>';
+  h += '<div class="grow">' + num('targetMarginPct', 'שולי רווח יעד (%)') + '</div>';
+  h += '<div class="grow">' + num('minMarginPct', 'שולי רווח מינימום (%)', 'למחיר רצפה') + '</div></div>';
+  h += '<h3>ציוד (מחירי הספק שלך) <span class="tag ver">נתון מאומת</span></h3><div class="row">';
+  h += '<div class="grow">' + num('equipUnitCamera', 'מצלמה ממוצעת (₪)') + '</div>';
+  h += '<div class="grow">' + num('equipUnitNVR', 'NVR (₪)') + '</div>';
+  h += '<div class="grow">' + num('cablePerMeter', 'כבל+חומרים למטר (₪)') + '</div></div>';
+  h += '<h3>הצעת מחיר</h3><div class="row">';
+  h += '<div class="grow">' + num('warrantyMonths', 'אחריות (חודשים)') + '</div>';
+  h += '<div class="grow"><label class="f">תנאי תשלום</label><input id="s_paymentTerms" value="' + E(b.paymentTerms) + '"></div>';
+  h += '<div class="grow">' + num('quoteValidityDays', 'תוקף הצעה (ימים)') + '</div></div>';
+  h += '<label class="f"><input type="checkbox" id="s_vat" ' + (b.vatRegistered ? 'checked' : '') + ' style="width:auto"> עוסק מורשה (מע״מ ' + b.vatPct + '%)</label>';
+  h += '<h3>נתוני שוק</h3><label class="f"><input type="checkbox" id="s_demo" ' + (S.demoMarketEnabled ? 'checked' : '') + ' style="width:auto"> ' +
+    'הצג נתוני הדגמה <span class="tag demo">דמו</span></label>' +
+    '<p class="muted">נתוני ההדגמה מסומנים בבירור ואינם נתוני שוק אמיתיים. כבה אותם כדי לראות איך המערכת מתנהגת בלי נתוני שוק (טווח רחב יותר, ביטחון נמוך יותר).</p>';
+  h += '<div class="btnrow"><button class="btn" id="s_save">💾 שמור הגדרות</button></div><div id="s_msg"></div></div>';
+  // market observations
+  h += '<div class="card"><h2>📊 תצפיות שוק שלי</h2><p class="muted">הוסף מחירים שראית בשוק (הצעות מתחרים, עבודות שהפסדת). כל תצפית מתויגת עם מקור ותאריך.</p>';
+  h += '<div class="row"><div class="grow"><label class="f">תיאור</label><input id="o_label" placeholder="למשל: מתחרה X, בית פרטי 6 מצלמות"></div></div>';
+  h += '<div class="row"><div class="grow"><label class="f">מחיר מינימום (₪)</label><input type="number" id="o_min" min="0"></div>';
+  h += '<div class="grow"><label class="f">מחיר מקסימום (₪)</label><input type="number" id="o_max" min="0"></div></div>';
+  h += '<div class="row"><div class="grow"><label class="f">סוג נכס</label><select id="o_pt">' +
+    ['house', 'apartment', 'office', 'shop', 'warehouse', 'factory', 'building'].map(v => '<option value="' + v + '">' + L.propertyType[v] + '</option>').join('') + '</select></div>';
+  h += '<div class="grow"><label class="f">כמות מצלמות</label><select id="o_cb"><option>1-4</option><option>5-8</option><option>9-16</option><option>17+</option></select></div></div>';
+  h += '<div class="btnrow"><button class="btn ghost" id="o_add">+ הוסף תצפית</button></div><div id="o_list">' + UI_obsList() + '</div></div>';
+  $app().innerHTML = h;
+  document.getElementById('s_save').onclick = () => {
+    const g = id => document.getElementById(id).value;
+    const gn = id => parseFloat(g(id)) || 0;
+    Object.assign(b, { name: g('s_name'), phone: g('s_phone'), city: g('s_city'), email: g('s_email'),
+      laborHourly: gn('s_laborHourly'), helperHourly: gn('s_helperHourly'), kmCost: gn('s_kmCost'),
+      overheadPct: gn('s_overheadPct'), targetMarginPct: gn('s_targetMarginPct'), minMarginPct: gn('s_minMarginPct'),
+      equipUnitCamera: gn('s_equipUnitCamera'), equipUnitNVR: gn('s_equipUnitNVR'), cablePerMeter: gn('s_cablePerMeter'),
+      warrantyMonths: gn('s_warrantyMonths'), paymentTerms: g('s_paymentTerms'), quoteValidityDays: gn('s_quoteValidityDays'),
+      vatRegistered: document.getElementById('s_vat').checked });
+    S.demoMarketEnabled = document.getElementById('s_demo').checked;
+    UI_save();
+    document.getElementById('s_msg').innerHTML = '<div class="alert info">✅ נשמר.</div>';
+  };
+  document.getElementById('o_add').onclick = () => {
+    const mn = parseFloat(document.getElementById('o_min').value), mx = parseFloat(document.getElementById('o_max').value);
+    if (!mn || !mx) return;
+    S.marketObservations.push({ id: AIPA.uid(), createdAt: new Date().toISOString(),
+      label: document.getElementById('o_label').value || 'תצפית שוק',
+      priceMin: Math.min(mn, mx), priceMax: Math.max(mn, mx), n: 1, source: 'owner',
+      sourceLabel: 'תצפית שלך', date: new Date().toISOString().slice(0, 7),
+      category: { propertyType: document.getElementById('o_pt').value, camBucket: document.getElementById('o_cb').value } });
+    UI_save(); document.getElementById('o_list').innerHTML = UI_obsList();
+  };
+}
+function UI_obsList() {
+  if (!S.marketObservations.length) return '<p class="muted">אין תצפיות עדיין.</p>';
+  return '<table class="q"><tr><th>תיאור</th><th>טווח</th><th>קטגוריה</th><th></th></tr>' +
+    S.marketObservations.map(o => '<tr><td>' + E(o.label) + ' <span class="tag ver">שלי</span></td><td>' + F(o.priceMin) + '–' + F(o.priceMax) +
+      '</td><td>' + L.propertyType[o.category.propertyType] + ' · ' + o.category.camBucket + '</td>' +
+      '<td><button class="btn ghost" data-delob="' + o.id + '" style="padding:4px 10px">מחק</button></td></tr>').join('') + '</table>';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-delob]'); if (!b) return;
+  S.marketObservations = S.marketObservations.filter(o => o.id !== b.dataset.delob);
+  UI_save(); document.getElementById('o_list').innerHTML = UI_obsList();
+});
+</script>
+<script>
+"use strict";
+/* ================= NEW JOB WIZARD ================= */
+function UI_wiz() {
+  if (!UI.wiz) UI.wiz = { step: 1, text: '', params: null, meta: null, questions: [], answers: {}, result: null };
+  const w = UI.wiz;
+  const steps = ['תיאור', 'הבנה', 'שאלות', 'תמחור', 'הצעה'];
+  let h = '<div class="stepbar">' + steps.map((s, i) =>
+    '<span class="' + (w.step === i + 1 ? 'on' : '') + '">' + (i + 1) + '. ' + s + '</span>').join('') + '</div>';
+  if (w.step === 1) h += UI_wizDescribe(w);
+  else if (w.step === 2) h += UI_wizUnderstood(w);
+  else if (w.step === 3) h += UI_wizQuestions(w);
+  else if (w.step === 4) h += UI_wizResults(w);
+  else if (w.step === 5) h += UI_wizQuote(w);
+  $app().innerHTML = h;
+  UI_wizBind(w);
+}
+function UI_wizDescribe(w) {
+  return '<div class="card"><h2>📝 עבודה חדשה — תאר/י במשפט אחד</h2>' +
+    '<p class="muted">דוגמה: ״בית פרטי, 6 מצלמות, 4 בחוץ, 2 בפנים, שתי קומות, אין תשתית.״</p>' +
+    '<div class="row"><div class="grow"><textarea id="w_text" placeholder="תאר/י את העבודה כאן...">' + E(w.text) + '</textarea></div>' +
+    '<button class="voicebtn" id="w_voice" title="הקלטה קולית">🎤</button></div>' +
+    '<div id="w_voicemsg" class="muted"></div>' +
+    '<div class="btnrow"><button class="btn big" id="w_next">המשך ←</button></div></div>';
+}
+function UI_paramRow(label, val, src) {
+  const tag = src === 'user' ? '<span class="tag ver">נתון מאומת</span>' :
+    src === 'ai-estimate' ? '<span class="tag est">הערכה</span>' : '<span class="tag est">לא ידוע</span>';
+  return '<div class="kv"><span>' + label + ' ' + tag + '</span><b>' + val + '</b></div>';
+}
+function UI_wizUnderstood(w) {
+  const p = w.params, meta = w.meta || {};
+  const src = f => (meta[f] || {}).source || 'unknown';
+  const pv = (f, fmt) => {
+    const v = p[f];
+    if (v == null || v === 'unknown') return '—';
+    return fmt ? fmt(v) : v;
+  };
+  let h = '<div class="card"><h2>🔍 זה מה שהבנתי:</h2><div class="understood">';
+  h += UI_paramRow('מספר מצלמות', pv('cameras'), src('cameras'));
+  h += UI_paramRow('בפנים', pv('indoor'), src('indoor'));
+  h += UI_paramRow('בחוץ', pv('outdoor'), src('outdoor'));
+  h += UI_paramRow('סוג נכס', L.propertyType[p.propertyType], src('propertyType'));
+  h += UI_paramRow('סוג עבודה', L.jobType[p.jobType], src('jobType'));
+  h += UI_paramRow('תשתית', L.infra[p.infrastructure], src('infrastructure'));
+  h += UI_paramRow('קומות', pv('floors'), src('floors'));
+  h += UI_paramRow('עיר / אזור', pv('city'), src('city'));
+  h += UI_paramRow('גישה', L.access[p.accessDifficulty], src('accessDifficulty'));
+  h += '</div><p class="muted">נתונים מסומנים <span class="tag est">הערכה</span> יחושבו אוטומטית ויסומנו — שום דבר לא מוצג כעובדה כשהוא הערכה.</p>';
+  h += '<div class="btnrow"><button class="btn ghost" id="w_back">→ חזרה</button>' +
+    '<button class="btn big" id="w_next">המשך לשאלות ←</button></div></div>';
+  return h;
+}
+function UI_wizQuestions(w) {
+  if (!w.questions.length) {
+    const r = AIPA.extract(w.text);
+    w.params = r.params; w.meta = r.meta;
+    w.questions = AIPA.pickQuestions(w.params, 4);
+  }
+  let h = '<div class="card"><h2>❓ כמה שאלות קצרות</h2><p class="muted">רק מה שמשפיע מהותית על המחיר. על כל שאלה אפשר לענות <b>״לא יודע/ת״</b>.</p>';
+  if (!w.questions.length) h += '<div class="alert info">כל הפרמטרים המהותיים ידועים — אין שאלות נוספות.</div>';
+  w.questions.forEach((q, i) => {
+    h += '<div class="card" style="background:#fafbff"><label class="f">' + (i + 1) + '. ' + q.q + '</label>';
+    if (q.type === 'split') {
+      h += '<div class="row"><div class="grow"><label class="f">בפנים</label><input type="number" id="qa_split_in" min="0" value="' + (w.params.indoor || '') + '"></div>' +
+        '<div class="grow"><label class="f">בחוץ</label><input type="number" id="qa_split_out" min="0" value="' + (w.params.outdoor || '') + '"></div></div>';
+    } else if (q.type === 'text') {
+      h += '<input id="qa_' + q.field + '" placeholder="' + (q.ph || '') + '" value="' + E(w.params[q.field] === 'unknown' ? '' : w.params[q.field] || '') + '">';
+    } else {
+      h += '<select id="qa_' + q.field + '"><option value="">— בחר/י —</option>' +
+        q.opts.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('') + '</select>';
+    }
+    h += '<label class="f" style="font-weight:400"><input type="checkbox" id="qa_' + q.field + '_dk" style="width:auto"> לא יודע/ת</label></div>';
+  });
+  h += '<div class="btnrow"><button class="btn ghost" id="w_back">→ חזרה</button>' +
+    '<button class="btn big" id="w_calc">חשב/י מחיר ←</button></div></div>';
+  return h;
+}
+function UI_compute(w) {
+  const biz = AIPA.biz(S);
+  const complexity = AIPA.complexity(w.params);
+  const cost = AIPA.costEngine(biz, w.params, complexity);
+  const market = AIPA.marketEngine(S, biz, w.params);
+  const prices = AIPA.priceEngine(biz, cost, market, complexity);
+  const confidence = AIPA.confidenceEngine(biz, w.params, cost, market);
+  const job = { id: AIPA.uid(), createdAt: new Date().toISOString(), rawText: w.text,
+    params: w.params, paramMeta: w.meta, cost, market, complexityScore: complexity.score,
+    complexityBand: complexity.band, prices, confidence: confidence.level,
+    confidenceReasons: confidence.reasons, complexityParts: complexity.parts };
+  job.insights = AIPA.advisor(biz, job, cost, market, prices, confidence);
+  return job;
+}
+function UI_wizResults(w) {
+  if (!w.result) w.result = UI_compute(w);
+  const j = w.result, c = j.cost, m = j.market, pr = j.prices;
+  let h = '<div class="card"><h2>💡 המלצת תמחור</h2>';
+  h += '<p>רמת ביטחון: <span class="conf ' + j.confidence + '">' + L.confidence[j.confidence] + '</span> <span class="muted">(' + j.confidenceReasons.join('; ') + ')</span></p>';
+  if (m.demoOnly) h += '<div class="alert warn">⚠️ ' + E(AIPA.DEMO_BANNER) + '</div>';
+  if (!m.sufficient) h += '<div class="alert warn">⚠️ ' + E(m.note) + '</div>';
+  // prices
+  h += '<div class="pricegrid">';
+  h += '<div class="pricebox small card"><div class="pl">רצפה</div><div class="pv">' + F(pr.floor) + '</div><div class="pd">מינימום כלכלי — מתחת לזה מפסידים</div></div>';
+  h += '<div class="pricebox small card"><div class="pl">תחרותי</div><div class="pv">' + (pr.competitive ? F(pr.competitive) : '—') + '</div><div class="pd">' +
+    (pr.competitive ? 'ממצב שוק' + (m.demoOnly ? ' (דמו)' : '') : 'אין נתוני שוק מספיקים') + '</div></div>';
+  h += '<div class="pricebox small card"><div class="pl">פרימיום</div><div class="pv">' + F(pr.premium) + '</div><div class="pd">ללקוח שמעריך איכות/אחריות</div></div>';
+  h += '</div>';
+  h += '<div class="pricebox rec"><div class="pl">⭐ המחיר המומלץ</div><div class="pv">' + F(pr.recommended) + '</div><div class="pd">' + pr.drivers.join(' · ') + '</div></div>';
+  if (pr.winModel) h += '<p class="muted">📈 מודל רווח צפוי מההיסטוריה שלך: רווח צפוי ' + F(pr.winModel.expectedProfit) + ' (סיכוי זכייה משוער ' + pr.winModel.pwin + '%, n=' + pr.winModel.n + ').</p>';
+  // cost breakdown
+  h += '<h3>פירוט עלות משוערת <span class="tag est">הערכה</span></h3>';
+  h += '<div class="kv"><span>שעות עבודה משוערות <span class="tag est">הערכה</span>' + (c.calibNote ? ' <span class="muted">(' + E(c.calibNote) + ')</span>' : '') + '</span><b>' + c.laborHoursEst + ' שעות</b></div>';
+  h += '<div class="kv"><span>עלות עבודה <span class="tag ver">נתון מאומת</span></span><b>' + F(c.laborCost) + '</b></div>';
+  h += '<div class="kv"><span>ציוד <span class="tag ver">נתון מאומת</span> + <span class="tag est">הערכת כמויות</span></span><b>' + F(c.equipCost) + '</b></div>';
+  h += '<div class="kv"><span>חומרים/כבלים (' + c.cableMetersEst + ' מ׳) <span class="tag est">הערכה</span></span><b>' + F(c.materialsCost) + '</b></div>';
+  h += '<div class="kv"><span>נסיעות <span class="tag est">הערכה</span></span><b>' + F(c.travelCost) + '</b></div>';
+  h += '<div class="kv"><span>תקורה (' + AIPA.biz(S).overheadPct + '%)</span><b>' + F(c.overhead) + '</b></div>';
+  h += '<div class="kv"><span>רזרבת אי־ודאות (' + c.bufferPct + '%) <span class="tag est">הערכה</span></span><b>' + F(c.bufferCost) + '</b></div>';
+  h += '<div class="kv"><span><b>עלות אמיתית משוערת</b></span><b>' + F(c.trueCost) + '</b></div>';
+  if (m.sufficient) {
+    h += '<h3>טווח שוק ' + (m.demoOnly ? '<span class="tag demo">דמו</span>' : '<span class="tag ver">נתון מאומת</span>') + '</h3>';
+    h += '<p>' + F(m.min) + ' – ' + F(m.max) + ' · חציון: ' + F(m.median) + ' · מבוסס על ' + m.n + ' תצפיות</p>';
+    h += '<p class="muted">' + m.sources.map(s => E(s.label) + (s.demo ? ' <span class="tag demo">דמו</span>' : '')).join('; ') + '</p>';
+  }
+  h += '<details class="how"><summary>איך חושבה המורכבות? (' + j.complexityScore + '/100 — ' + j.complexityBand + ')</summary>';
+  h += '<div class="bar"><i style="width:' + j.complexityScore + '%"></i></div>';
+  h += j.complexityParts.map(x => '<div class="kv"><span>' + E(x.label) + '</span><b>+' + x.pts + '</b></div>').join('') + '</details>';
+  // insights
+  if (j.insights.length) {
+    h += '<h3>💼 תובנות עסקיות (עד 3)</h3>';
+    for (const ins of j.insights)
+      h += '<div class="insight"><b>' + E(ins.what) + '</b><p>' + E(ins.why) + '</p><p class="act">לפעולה: ' + E(ins.action) + '</p></div>';
+  }
+  // choose price
+  h += '<h3>בחירת מחיר</h3><div class="row"><div class="grow"><label class="f">מחיר סופי (₪)</label>' +
+    '<input type="number" id="w_price" value="' + pr.recommended + '" min="0"></div>' +
+    '<div class="grow"><label class="f">עמדת מחיר</label><select id="w_pos">' +
+    [['recommended', 'מומלץ'], ['floor', 'רצפה'], ['competitive', 'תחרותי'], ['premium', 'פרימיום'], ['custom', 'מותאם אישית']]
+      .map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('') + '</select></div></div>';
+  h += '<div class="btnrow"><button class="btn ghost" id="w_back">→ חזרה</button>' +
+    '<button class="btn big" id="w_approve">✅ אשר/י מחיר והפק הצעה</button></div>';
+  h += '<p class="muted">המערכת ממליצה — ההחלטה תמיד שלך. שום דבר לא נשלח אוטומטית.</p></div>';
+  return h;
+}
+function UI_wizQuote(w) {
+  const j = w.result, b = AIPA.biz(S);
+  const cust = w.customer || { name: '', phone: '' };
+  if (!w.quoteReady) {
+    let h = '<div class="card"><h2>🧾 פרטי לקוח להצעה</h2>';
+    h += '<p class="muted">מחיר נבחר: <b>' + F(j.chosen.price) + '</b> · ההצעה תופק רק אחרי אישורך — שום דבר לא נשלח אוטומטית.</p>';
+    h += '<div class="row"><div class="grow"><label class="f">שם לקוח</label><input id="q_cname" value="' + E(cust.name) + '"></div>';
+    h += '<div class="grow"><label class="f">טלפון</label><input id="q_cphone" value="' + E(cust.phone) + '"></div></div>';
+    h += '<div class="btnrow"><button class="btn ghost" id="w_back">→ חזרה</button>' +
+      '<button class="btn big" id="w_genquote">הפק הצעת מחיר</button></div></div>';
+    return h;
+  }
+  return UI_quoteDoc(j, b, w.customer);
+}
+function UI_quoteDoc(j, b, cust) {
+  const price = j.chosen.price;
+  const vat = b.vatRegistered ? ' + מע״מ (' + b.vatPct + '%): ' + F(price * (1 + b.vatPct / 100)) : ' (עוסק פטור)';
+  const validUntil = new Date(Date.now() + b.quoteValidityDays * 864e5).toISOString().slice(0, 10);
+  const p = j.params;
+  let h = '<div class="card"><div class="quote-doc">';
+  h += '<h2>הצעת מחיר ' + E(j.quote.number) + '</h2>';
+  h += '<div class="row"><div class="grow"><b>' + E(b.name || '—') + '</b><br><span class="muted">' + E(b.phone) + ' · ' + E(b.email) + '</span></div>';
+  h += '<div class="grow" style="text-align:left"><b>לקוח:</b> ' + E(cust.name || '—') + '<br><span class="muted">' + E(cust.phone || '') + '</span><br><span class="muted">תאריך: ' + new Date().toISOString().slice(0, 10) + ' · תוקף עד: ' + validUntil + '</span></div></div><hr>';
+  h += '<p><b>תיאור העבודה:</b> ' + E(j.rawText) + '</p>';
+  h += '<table class="q"><tr><th>פריט</th><th>פירוט</th><th>סכום</th></tr>';
+  h += '<tr><td>ציוד</td><td>' + (p.cameras || '?') + ' מצלמות + NVR/אחסון + אביזרים' + '</td><td>' + F(j.cost.equipCost) + '</td></tr>';
+  h += '<tr><td>עבודה</td><td>התקנה, כ־' + j.cost.laborHoursEst + ' שעות <span class="tag est">הערכה</span></td><td>' + F(j.cost.laborCost) + '</td></tr>';
+  h += '<tr><td>חומרים</td><td>כבלים ותשתית</td><td>' + F(j.cost.materialsCost) + '</td></tr>';
+  h += '<tr><td colspan="2" style="text-align:left"><b>סה״כ</b></td><td><b>' + F(price) + vat + '</b></td></tr></table>';
+  h += '<p class="muted">אחריות: ' + b.warrantyMonths + ' חודשים · תנאי תשלום: ' + E(b.paymentTerms) + '</p>';
+  h += '<p class="muted">הערות: כמויות הציוד ושעות העבודה הן הערכות לצורך תמחור.</p>';
+  h += '<div class="sig"><div>חתימת הלקוח</div><div>חתימת העסק</div></div>';
+  h += '</div><div class="btnrow noprint"><button class="btn" onclick="window.print()">🖨️ הדפס / שמור כ־PDF</button>' +
+    '<button class="btn ghost" id="w_done">סיום ← לרשימת עבודות</button></div></div>';
+  return h;
+}
+function UI_wizBind(w) {
+  const q = id => document.getElementById(id);
+  if (w.step === 1) {
+    q('w_next').onclick = () => {
+      w.text = q('w_text').value.trim();
+      if (!w.text) { alert('נא לתאר את העבודה'); return; }
+      const r = AIPA.extract(w.text); w.params = r.params; w.meta = r.meta; w.questions = []; w.step = 2; UI_wiz();
+    };
+    // voice input
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      q('w_voice').onclick = () => {
+        const rec = new SR(); rec.lang = 'he-IL'; rec.interimResults = false;
+        const btn = q('w_voice'), msg = q('w_voicemsg');
+        btn.classList.add('rec'); msg.textContent = '🎙️ מקליט... דבר/י עכשיו';
+        rec.onresult = ev => { q('w_text').value += (q('w_text').value ? ' ' : '') + ev.results[0][0].transcript; };
+        rec.onend = () => { btn.classList.remove('rec'); msg.textContent = ''; };
+        rec.onerror = () => { btn.classList.remove('rec'); msg.textContent = 'שגיאת הקלטה — נסה/י שוב או הקלד/י.'; };
+        rec.start();
+      };
+    } else q('w_voice').onclick = () => { q('w_voicemsg').textContent = 'הדפדפן לא תומך בהקלטה קולית — נא להקליד.'; };
+  }
+  if (w.step === 2) {
+    q('w_back').onclick = () => { w.step = 1; UI_wiz(); };
+    q('w_next').onclick = () => { w.step = 3; UI_wiz(); };
+  }
+  if (w.step === 3) {
+    q('w_back').onclick = () => { w.step = 2; UI_wiz(); };
+    q('w_calc').onclick = () => {
+      const answers = {};
+      for (const qq of w.questions) {
+        const dk = q('qa_' + qq.field + '_dk');
+        if (dk && dk.checked) { answers[qq.field] = 'dontknow'; continue; }
+        if (qq.type === 'split') {
+          const ii = parseInt(q('qa_split_in').value), oo = parseInt(q('qa_split_out').value);
+          answers.split = { indoor: isNaN(ii) ? null : ii, outdoor: isNaN(oo) ? null : oo };
+        } else {
+          const el = q('qa_' + qq.field);
+          answers[qq.field] = el ? el.value : 'dontknow';
+        }
+      }
+      const r = AIPA.applyAnswers(w.params, w.meta, answers);
+      w.params = r.p; w.meta = r.meta;
+      if (!w.params.cameras) { alert('חסר מספר מצלמות — נא להזין בתיאור או כאן'); w.step = 1; UI_wiz(); return; }
+      // default cameras split if still unknown: all outdoor estimate? No — ask. Use cameras total only.
+      w.step = 4; UI_wiz();
+    };
+  }
+  if (w.step === 4) {
+    q('w_back').onclick = () => { w.step = 3; w.result = null; UI_wiz(); };
+    q('w_approve').onclick = () => {
+      const price = parseFloat(q('w_price').value);
+      if (!price || price <= 0) { alert('נא להזין מחיר תקין'); return; }
+      const j = w.result;
+      j.chosen = { price: Math.round(price), position: q('w_pos').value };
+      j.quote = { number: 'Q-' + new Date().getFullYear() + '-' + String(Object.keys(AIPA.biz(S).jobs).length + 1).padStart(3, '0'),
+                  status: 'waiting', rejectionReason: null, issuedAt: new Date().toISOString(), validUntil: null };
+      AIPA.biz(S).jobs[j.id] = j; UI_save();
+      w.step = 5; UI_wiz();
+    };
+  }
+  if (w.step === 5) {
+    const j = w.result;
+    if (!w.quoteReady) {
+      const gb = q('w_genquote');
+      if (gb) gb.onclick = () => {
+        w.customer = { name: q('q_cname').value.trim(), phone: q('q_cphone').value.trim() };
+        w.quoteReady = true;
+        j.quote.issuedAt = new Date().toISOString(); UI_save(); UI_wiz();
+      };
+      const bk = q('w_back'); if (bk) bk.onclick = () => { w.step = 4; UI_wiz(); };
+    } else {
+      const d = q('w_done'); if (d) d.onclick = () => UI_nav('dash');
+    }
+  }
+}
+</script>
+<script>
+"use strict";
+/* ================= JOB DETAIL: tracking + actuals + learning ================= */
+function UI_job() {
+  const biz = AIPA.biz(S);
+  const j = biz.jobs[UI.jobId];
+  if (!j) { UI_nav('dash'); return; }
+  const p = j.params, st = j.quote ? j.quote.status : 'draft';
+  let h = '<div class="card"><div class="btnrow noprint" style="margin:0 0 10px"><button class="btn ghost" data-nav="dash">→ חזרה לרשימה</button></div>';
+  h += '<h2>' + E(UI_jobTitle(j)) + ' <span class="st ' + st + '">' + L.qstatus[st] + '</span></h2>';
+  h += '<p class="muted">נוצר: ' + E((j.createdAt || '').slice(0, 16).replace('T', ' ')) + ' · ביטחון: <span class="conf ' + j.confidence + '">' + L.confidence[j.confidence] + '</span></p>';
+  h += '<div class="kv"><span>מחיר נבחר</span><b>' + (j.chosen ? F(j.chosen.price) + ' (' + ({recommended:'מומלץ',floor:'רצפה',competitive:'תחרותי',premium:'פרימיום',custom:'מותאם אישית'}[j.chosen.position] || '') + ')' : '—') + '</b></div>';
+  h += '<div class="kv"><span>עלות משוערת</span><b>' + F(j.cost.trueCost) + '</b></div>';
+  h += '<div class="kv"><span>טווח מחירים</span><b>' + F(j.prices.floor) + ' – ' + F(j.prices.premium) + '</b></div>';
+  if (j.quote && j.quote.number) h += '<div class="kv"><span>הצעה</span><b>' + E(j.quote.number) + '</b></div>';
+  h += '</div>';
+
+  // result tracking
+  h += '<div class="card noprint"><h2>📋 מעקב תוצאה</h2>';
+  if (!j.quote || j.quote.status === 'waiting' || j.quote.status === 'draft') {
+    if (!j.quote) j.quote = { number: null, status: 'waiting', rejectionReason: null };
+    h += '<p class="muted">מה קרה עם ההצעה?</p><div class="btnrow">';
+    h += '<button class="btn" id="t_approved">✅ אושר</button>';
+    h += '<button class="btn ghost" id="t_rejected">❌ נדחה</button></div>';
+    h += '<div id="t_rejbox" style="display:none;margin-top:10px"><label class="f">סיבת דחייה (אופציונלי)</label><select id="t_reason">' +
+      '<option value="unknown">לא ידוע</option><option value="price">מחיר</option><option value="other">בחר ספק אחר</option><option value="postponed">העבודה נדחתה</option></select>' +
+      '<div class="btnrow"><button class="btn" id="t_rejok">שמור דחייה</button></div></div>';
+  } else {
+    h += '<p>סטטוס: <span class="st ' + j.quote.status + '">' + L.qstatus[j.quote.status] + '</span>' +
+      (j.quote.rejectionReason ? ' · סיבה: ' + L.rejReason[j.quote.rejectionReason] : '') + '</p>';
+    h += '<button class="btn ghost" id="t_reopen">פתח מחדש (ממתין)</button>';
+  }
+  h += '</div>';
+
+  // actuals
+  const ps = AIPA.profitSummary(biz, j);
+  h += '<div class="card"><h2>🔧 עלויות בפועל</h2>';
+  if (!j.actuals) {
+    h += '<p class="muted">אחרי סיום העבודה — הזן/י נתונים אמיתיים. המערכת תשווה להערכה ותלמד.</p>';
+    h += '<div class="row"><div class="grow"><label class="f">שעות עבודה בפועל <span class="tag est">הערכה הייתה: ' + j.cost.laborHoursEst + '</span></label><input type="number" id="a_hours" min="0" step="0.5"></div>';
+    h += '<div class="grow"><label class="f">עלות ציוד בפועל (₪) <span class="tag est">הערכה הייתה: ' + F(j.cost.equipCost) + '</span></label><input type="number" id="a_equip" min="0"></div>';
+    h += '<div class="grow"><label class="f">הוצאות חריגות (₪)</label><input type="number" id="a_extras" min="0" value="0"></div></div>';
+    h += '<div class="btnrow"><button class="btn" id="a_save">💾 שמור נתונים בפועל</button></div>';
+  } else {
+    h += '<div class="kv"><span>שעות עבודה: הערכה מול בפועל</span><b>' + j.variance.laborHoursEst + ' ← ' + j.variance.laborHoursActual + '</b></div>';
+    h += '<div class="kv"><span>עלות ציוד: הערכה מול בפועל</span><b>' + F(j.variance.equipCostEst) + ' ← ' + F(j.variance.equipCostActual) + '</b></div>';
+    if (ps) {
+      h += '<div class="kv"><span>עלות כוללת: משוער מול בפועל</span><b>' + F(ps.costEst) + ' ← ' + F(ps.costActual) + ' (' + (ps.variancePct >= 0 ? '+' : '') + ps.variancePct + '%)</b></div>';
+      h += '<div class="kv"><span>רווח: משוער מול בפועל</span><b>' + F(ps.profitEst) + ' ← ' + F(ps.profitActual) + '</b></div>';
+      const lf = AIPA.learningFactors(biz);
+      if (lf.n >= 3) h += '<div class="alert info">🧠 הלמידה פעילה: ' + lf.n + ' עבודות עם נתוני אמת. ' +
+        (Math.abs(lf.laborBiasPct) >= 15 ? 'הטיית שעות: ' + lf.laborBiasPct + '%. ' : '') +
+        (Math.abs(lf.equipBiasPct) >= 15 ? 'הטיית ציוד: ' + lf.equipBiasPct + '%.' : '') + '</div>';
+    }
+  }
+  h += '</div>';
+
+  // quote re-view
+  if (j.quote && j.quote.number) {
+    h += '<div class="card noprint"><h2>🧾 הצעת המחיר</h2><div class="btnrow"><button class="btn ghost" id="v_quote">צפה / הדפס</button></div><div id="v_qbox"></div></div>';
+  }
+  $app().innerHTML = h;
+  const q = id => document.getElementById(id);
+  if (q('t_approved')) q('t_approved').onclick = () => { j.quote.status = 'approved'; UI_save(); UI_job(); };
+  if (q('t_rejected')) q('t_rejected').onclick = () => { q('t_rejbox').style.display = 'block'; };
+  if (q('t_rejok')) q('t_rejok').onclick = () => { j.quote.status = 'rejected'; j.quote.rejectionReason = q('t_reason').value; UI_save(); UI_job(); };
+  if (q('t_reopen')) q('t_reopen').onclick = () => { j.quote.status = 'waiting'; j.quote.rejectionReason = null; UI_save(); UI_job(); };
+  if (q('a_save')) q('a_save').onclick = () => {
+    const ah = parseFloat(q('a_hours').value), ae = parseFloat(q('a_equip').value), ax = parseFloat(q('a_extras').value) || 0;
+    if (isNaN(ah) || isNaN(ae)) { alert('נא להזין שעות ועלות ציוד'); return; }
+    AIPA.recordActuals(j, { laborHours: ah, equipCost: ae, extras: ax });
+    UI_save(); UI_job();
+  };
+  if (q('v_quote')) q('v_quote').onclick = () => { q('v_qbox').innerHTML = UI_quoteDoc(j, biz, { name: '', phone: '' }); };
+}
+
+/* ================= INIT ================= */
+UI_render();
+</script>
+</main>
+</body>
+</html>
